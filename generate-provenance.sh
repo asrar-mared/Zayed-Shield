@@ -1,10 +1,28 @@
+#!/bin/bash
+set -e
+
+# إعداد المتغيرات الأساسية
+ARTIFACT="zayed-shield-v1.0.zip"
+REPO="github.com/asrar-mrad/zayed-shield"
+COMMIT_SHA=$(git rev-parse HEAD)
+SHA256=$(sha256sum $ARTIFACT | awk '{print $1}')
+RUN_ID=${GITHUB_RUN_ID:-"manual-run"}
+RUN_ATTEMPT=${GITHUB_RUN_ATTEMPT:-"1"}
+START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# إنشاء مجلد .sigstore لو مش موجود
+mkdir -p .sigstore
+
+# توليد ملف Provenance
+cat > .sigstore/zayed-shield-v1.0.sigstore.json <<EOF
 {
   "_type": "https://in-toto.io/Statement/v1",
   "subject": [
     {
-      "name": "zayed-shield-v1.0.zip",
+      "name": "$ARTIFACT",
       "digest": {
-        "sha256": "d9dbbf099cf0d18adacf1a5c386d989d6910f00c852d06a2c4504ba4148a5928"
+        "sha256": "$SHA256"
       }
     }
   ],
@@ -14,24 +32,24 @@
       "buildType": "https://github.com/asrar-mrad/zayed-shield/.github/workflows/build.yml",
       "externalParameters": {
         "workflow": "build.yml",
-        "repository": "github.com/asrar-mrad/zayed-shield",
+        "repository": "$REPO",
         "ref": "refs/heads/main",
         "trigger": "workflow_dispatch",
         "builder": "github-actions"
       },
       "internalParameters": {
         "os": "ubuntu-latest",
-        "run_id": "manual-run",
-        "run_attempt": "1"
+        "run_id": "$RUN_ID",
+        "run_attempt": "$RUN_ATTEMPT"
       },
       "resolvedDependencies": [
         {
-          "uri": "git+github.com/asrar-mrad/zayed-shield@refs/heads/main",
+          "uri": "git+$REPO@refs/heads/main",
           "digest": {
-            "gitCommit": "54bcf977d835c47befe9ab2ca4b911c90c7cbaf7"
+            "gitCommit": "$COMMIT_SHA"
           },
           "name": "guardian-core.js",
-          "downloadLocation": "https://github.com/asrar-mrad/zayed-shield/blob/main/guardian-core.js",
+          "downloadLocation": "https://$REPO/blob/main/guardian-core.js",
           "mediaType": "application/javascript",
           "annotations": {
             "source": "manual"
@@ -48,11 +66,14 @@
         }
       },
       "metadata": {
-        "invocationId": "build-manual-run",
-        "startedOn": "2025-11-26T08:23:39Z",
-        "finishedOn": "2025-11-26T08:23:39Z"
+        "invocationId": "build-$RUN_ID",
+        "startedOn": "$START_TIME",
+        "finishedOn": "$END_TIME"
       },
       "byproducts": []
     }
   }
 }
+EOF
+
+echo "✅ Provenance file generated at .sigstore/zayed-shield-v1.0.sigstore.json"
