@@ -1,0 +1,597 @@
+# ═══════════════════════════════════════════════════════════════
+# 🐳 CyberGuard AI - Docker Compose Configuration
+# ═══════════════════════════════════════════════════════════════
+# Production-Ready Stack for AI-Powered Cybersecurity Platform
+# Version: 2.0 | Year: 2070
+
+version: '3.9'
+
+# ═══════════════════════════════════════════════════════════════
+# 🌐 Networks
+# ═══════════════════════════════════════════════════════════════
+networks:
+  frontend_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+  
+  backend_net:
+    driver: bridge
+    internal: true  # لا يمكن الوصول من الخارج
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+  
+  database_net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+  
+  monitoring_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
+
+# ═══════════════════════════════════════════════════════════════
+# 💾 Volumes
+# ═══════════════════════════════════════════════════════════════
+volumes:
+  # Database volumes
+  postgres_data:
+    driver: local
+  postgres_backups:
+    driver: local
+  redis_data:
+    driver: local
+  mongodb_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  
+  # Application volumes
+  ai_models:
+    driver: local
+  malware_samples:
+    driver: local
+  logs:
+    driver: local
+  
+  # Monitoring volumes
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  
+  # Security volumes
+  vault_data:
+    driver: local
+  ssl_certs:
+    driver: local
+
+# ═══════════════════════════════════════════════════════════════
+# 🚀 Services
+# ═══════════════════════════════════════════════════════════════
+services:
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔷 API Gateway (Kong)
+  # ─────────────────────────────────────────────────────────────
+  api-gateway:
+    image: kong:3.5-alpine
+    container_name: cyberguard_gateway
+    restart: unless-stopped
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: postgres
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+      KONG_PG_DATABASE: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+    ports:
+      - "8000:8000"  # HTTP
+      - "8443:8443"  # HTTPS
+      - "8001:8001"  # Admin API
+      - "8002:8002"  # Admin GUI
+    networks:
+      - frontend_net
+      - backend_net
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔷 API Service (FastAPI)
+  # ─────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILD_DATE=${BUILD_DATE}
+        - VERSION=${VERSION}
+    image: cyberguard/api:${VERSION:-latest}
+    container_name: cyberguard_api
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - MONGODB_URL=mongodb://mongodb:27017/${MONGO_DB_NAME}
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - JWT_SECRET=${JWT_SECRET}
+      - API_KEY=${API_KEY}
+      - CUDA_VISIBLE_DEVICES=0,1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ai_models:/app/models:ro
+      - logs:/app/logs
+      - malware_samples:/app/samples
+    ports:
+      - "8080:8000"
+    networks:
+      - backend_net
+      - database_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔷 AI Inference Service
+  # ─────────────────────────────────────────────────────────────
+  ai-inference:
+    build:
+      context: ./services/ai-inference
+      dockerfile: Dockerfile.gpu
+    image: cyberguard/ai-inference:${VERSION:-latest}
+    container_name: cyberguard_ai
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+          memory: 32G
+        reservations:
+          cpus: '4'
+          memory: 16G
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
+    environment:
+      - CUDA_VISIBLE_DEVICES=0,1
+      - MODEL_PATH=/models
+      - BATCH_SIZE=32
+      - USE_QUANTIZATION=true
+    volumes:
+      - ai_models:/models:ro
+      - logs:/app/logs
+    ports:
+      - "8501:8501"  # TensorFlow Serving
+      - "8502:8502"  # Model Management
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔷 Worker Service (Celery)
+  # ─────────────────────────────────────────────────────────────
+  worker:
+    image: cyberguard/api:${VERSION:-latest}
+    container_name: cyberguard_worker
+    restart: unless-stopped
+    command: celery -A cyberguard.tasks worker --loglevel=info --concurrency=8 --pool=prefork
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - C_FORCE_ROOT=true
+    volumes:
+      - ai_models:/app/models:ro
+      - logs:/app/logs
+      - malware_samples:/app/samples
+    networks:
+      - backend_net
+      - database_net
+    depends_on:
+      - redis
+      - postgres
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔷 Celery Beat (Scheduler)
+  # ─────────────────────────────────────────────────────────────
+  celery-beat:
+    image: cyberguard/api:${VERSION:-latest}
+    container_name: cyberguard_beat
+    restart: unless-stopped
+    command: celery -A cyberguard.tasks beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    volumes:
+      - logs:/app/logs
+    networks:
+      - backend_net
+      - database_net
+    depends_on:
+      - redis
+
+  # ─────────────────────────────────────────────────────────────
+  # 🗄️ PostgreSQL Database
+  # ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: cyberguard_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - database_net
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=2GB
+      -c effective_cache_size=6GB
+      -c maintenance_work_mem=512MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=10MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_worker_processes=8
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_workers=8
+      -c max_parallel_maintenance_workers=4
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─────────────────────────────────────────────────────────────
+  # 🗄️ Redis Cache
+  # ─────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: cyberguard_redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 4gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync everysec
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - database_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────
+  # 🗄️ MongoDB (Document Store)
+  # ─────────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: cyberguard_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - "27017:27017"
+    networks:
+      - database_net
+    command: mongod --auth
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔍 Elasticsearch
+  # ─────────────────────────────────────────────────────────────
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: cyberguard_elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - xpack.security.enabled=false
+      - xpack.monitoring.enabled=true
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - database_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────
+  # 📊 Kibana
+  # ─────────────────────────────────────────────────────────────
+  kibana:
+    image: kibana:8.11.0
+    container_name: cyberguard_kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - database_net
+    depends_on:
+      - elasticsearch
+
+  # ─────────────────────────────────────────────────────────────
+  # 📊 Prometheus (Metrics)
+  # ─────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cyberguard_prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring_net
+      - backend_net
+
+  # ─────────────────────────────────────────────────────────────
+  # 📊 Grafana (Visualization)
+  # ─────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cyberguard_grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring_net
+    depends_on:
+      - prometheus
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔔 AlertManager
+  # ─────────────────────────────────────────────────────────────
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: cyberguard_alertmanager
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    ports:
+      - "9093:9093"
+    networks:
+      - monitoring_net
+
+  # ─────────────────────────────────────────────────────────────
+  # 📝 Jaeger (Distributed Tracing)
+  # ─────────────────────────────────────────────────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: cyberguard_jaeger
+    restart: unless-stopped
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "5775:5775/udp"  # Zipkin compact
+      - "6831:6831/udp"  # Jaeger compact
+      - "6832:6832/udp"  # Jaeger binary
+      - "5778:5778"      # Serve configs
+      - "16686:16686"    # Web UI
+      - "14268:14268"    # Collector HTTP
+      - "14250:14250"    # Collector gRPC
+      - "9411:9411"      # Zipkin
+    networks:
+      - monitoring_net
+      - backend_net
+
+  # ─────────────────────────────────────────────────────────────
+  # 🌐 Nginx (Reverse Proxy & Load Balancer)
+  # ─────────────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: cyberguard_nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ssl_certs:/etc/nginx/certs:ro
+      - logs:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend_net
+    depends_on:
+      - api
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────────────────────
+  # 📨 RabbitMQ (Message Queue)
+  # ─────────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: cyberguard_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    networks:
+      - backend_net
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔐 HashiCorp Vault (Secrets Management)
+  # ─────────────────────────────────────────────────────────────
+  vault:
+    image: vault:latest
+    container_name: cyberguard_vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN}
+    volumes:
+      - vault_data:/vault/data
+      - ./vault/config.hcl:/vault/config/config.hcl:ro
+    ports:
+      - "8200:8200"
+    networks:
+      - backend_net
+    command: server
+
+  # ─────────────────────────────────────────────────────────────
+  # 🔍 Falco (Runtime Security)
+  # ─────────────────────────────────────────────────────────────
+  falco:
+    image: falcosecurity/falco:latest
+    container_name: cyberguard_falco
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - /dev:/host/dev
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
+      - ./falco/falco.yaml:/etc/falco/falco.yaml:ro
+      - ./falco/rules:/etc/falco/rules:ro
+    networks:
+      - monitoring_net
+
+# ═══════════════════════════════════════════════════════════════
+# 📝 Usage Instructions
+# ═══════════════════════════════════════════════════════════════
+#
+# 🚀 Start all services:
+#   docker-compose up -d
+#
+# 🔍 View logs:
+#   docker-compose logs -f [service_name]
+#
+# 🛑 Stop all services:
+#   docker-compose down
+#
+# 🗑️ Remove volumes:
+#   docker-compose down -v
+#
+# 🔄 Restart service:
+#   docker-compose restart [service_name]
+#
+# 📊 Scale service:
+#   docker-compose up -d --scale api=5
+#
+# 💻 Execute command:
+#   docker-compose exec api bash
+#
+# ═══════════════════════════════════════════════════════════════
