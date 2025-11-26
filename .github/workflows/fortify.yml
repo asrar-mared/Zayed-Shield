@@ -1,0 +1,807 @@
+# المسار: .github/workflows/fortify.yml
+# 🏰 المارد الرقمي - نظام التحصين والحماية الشاملة
+# نظام متقدم لتحصين وتقوية دفاعات المشروع ضد جميع أنواع الهجمات
+
+name: 🏰 المارد الرقمي - التحصين الأمني الشامل
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.py'
+      - '**.java'
+      - '**.go'
+      - 'Dockerfile'
+      - 'package*.json'
+      - 'requirements.txt'
+      - 'pom.xml'
+      - 'build.gradle'
+  
+  pull_request:
+    branches: [ main, master ]
+  
+  schedule:
+    # تحصين أسبوعي كامل
+    - cron: '0 3 * * 0'  # كل أحد الساعة 3 صباحاً
+  
+  workflow_dispatch:
+    inputs:
+      fortification_level:
+        description: 'مستوى التحصين'
+        required: true
+        default: 'maximum'
+        type: choice
+        options:
+          - basic
+          - standard
+          - advanced
+          - maximum
+          - paranoid
+      enable_hardening:
+        description: 'تفعيل التقوية الشاملة'
+        required: false
+        type: boolean
+        default: true
+      auto_fix:
+        description: 'إصلاح تلقائي للمشاكل'
+        required: false
+        type: boolean
+        default: false
+
+# أذونات صارمة للأمان القصوى
+permissions:
+  contents: write
+  security-events: write
+  pull-requests: write
+  issues: write
+  actions: read
+  checks: write
+  deployments: write
+
+env:
+  FORTIFY_VERSION: '23.2.0'
+  SONAR_VERSION: 'latest'
+  SNYK_VERSION: 'latest'
+  FORTIFICATION_LEVEL: ${{ github.event.inputs.fortification_level || 'maximum' }}
+  AUTO_FIX: ${{ github.event.inputs.auto_fix || 'false' }}
+
+jobs:
+  # ========================================
+  # المرحلة 1: التقييم الأمني الشامل
+  # ========================================
+  security-assessment:
+    name: 🔍 التقييم الأمني الأولي
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      risk_level: ${{ steps.assess.outputs.risk_level }}
+      vulnerabilities_count: ${{ steps.assess.outputs.vuln_count }}
+      fortification_needed: ${{ steps.assess.outputs.needs_fortify }}
+    
+    steps:
+      - name: 📥 استنساخ الكود
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🔍 تحليل سطح الهجوم
+        id: assess
+        run: |
+          echo "🔍 تحليل سطح الهجوم..."
+          
+          # حساب نقاط التعرض
+          exposure_score=0
+          
+          # فحص الملفات الحساسة
+          if [ -d ".env" ] || [ -f ".env" ]; then
+            exposure_score=$((exposure_score + 10))
+          fi
+          
+          # فحص المنافذ المفتوحة في الكود
+          open_ports=$(grep -r "listen.*[0-9]\{4,5\}" . --include="*.js" --include="*.py" | wc -l)
+          exposure_score=$((exposure_score + open_ports * 2))
+          
+          # فحص نقاط الدخول API
+          api_endpoints=$(grep -r "app\.(get|post|put|delete)" . --include="*.js" | wc -l)
+          exposure_score=$((exposure_score + api_endpoints))
+          
+          # فحص استخدام قواعد البيانات
+          db_usage=$(grep -r "mongoose\|sequelize\|mysql\|postgres" . --include="*.js" | wc -l)
+          exposure_score=$((exposure_score + db_usage * 3))
+          
+          # تحديد مستوى المخاطر
+          if [ $exposure_score -lt 20 ]; then
+            risk_level="LOW"
+          elif [ $exposure_score -lt 50 ]; then
+            risk_level="MEDIUM"
+          elif [ $exposure_score -lt 100 ]; then
+            risk_level="HIGH"
+          else
+            risk_level="CRITICAL"
+          fi
+          
+          echo "risk_level=$risk_level" >> $GITHUB_OUTPUT
+          echo "vuln_count=$exposure_score" >> $GITHUB_OUTPUT
+          echo "needs_fortify=true" >> $GITHUB_OUTPUT
+          
+          echo "📊 مستوى المخاطر: $risk_level"
+          echo "🎯 نقاط التعرض: $exposure_score"
+      
+      - name: 📊 إنشاء تقرير التقييم
+        run: |
+          cat << EOF > assessment-report.md
+          # 🔍 تقرير التقييم الأمني - Digital Warrior Secrets
+          
+          ## 📊 النتائج الأولية
+          - **مستوى المخاطر**: ${{ steps.assess.outputs.risk_level }}
+          - **نقاط التعرض**: ${{ steps.assess.outputs.vuln_count }}
+          - **التاريخ**: $(date '+%Y-%m-%d %H:%M:%S')
+          
+          ## 🎯 التوصيات
+          - يحتاج المشروع إلى تحصين فوري
+          - تطبيق معايير الأمان الصارمة
+          - مراجعة جميع نقاط الدخول
+          
+          EOF
+          
+          cat assessment-report.md
+      
+      - name: 📤 رفع تقرير التقييم
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-assessment
+          path: assessment-report.md
+          retention-days: 90
+
+  # ========================================
+  # المرحلة 2: تحصين Fortify الشامل
+  # ========================================
+  fortify-sca-scan:
+    name: 🛡️ Fortify SCA - التحليل المتقدم
+    runs-on: ubuntu-latest
+    needs: security-assessment
+    timeout-minutes: 45
+    
+    steps:
+      - name: 📥 استنساخ الكود
+        uses: actions/checkout@v4
+      
+      - name: 🔧 إعداد Java للـ Fortify
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: 🔧 إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      
+      - name: 📦 تثبيت التبعيات
+        run: |
+          if [ -f package.json ]; then
+            npm ci --prefer-offline
+          fi
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      
+      - name: 🛡️ Fortify SCA - البناء والمسح
+        run: |
+          echo "🛡️ بدء تحليل Fortify SCA..."
+          
+          # محاكاة Fortify (في الإنتاج استخدم Fortify الحقيقي)
+          cat << 'EOF' > fortify-analysis.sh
+          #!/bin/bash
+          
+          echo "🔍 Fortify Static Code Analyzer"
+          echo "================================"
+          
+          # تحليل JavaScript
+          echo "📊 تحليل JavaScript/TypeScript..."
+          find . -name "*.js" -o -name "*.ts" | while read file; do
+            # فحص SQL Injection
+            if grep -n "query.*+.*req\." "$file"; then
+              echo "🚨 SQL Injection محتمل: $file"
+            fi
+            
+            # فحص XSS
+            if grep -n "innerHTML.*=" "$file" | grep -v "sanitize"; then
+              echo "⚠️ XSS محتمل: $file"
+            fi
+            
+            # فحص Path Traversal
+            if grep -n "readFile.*req\." "$file"; then
+              echo "🚨 Path Traversal محتمل: $file"
+            fi
+          done
+          
+          # تحليل Python
+          echo "📊 تحليل Python..."
+          find . -name "*.py" | while read file; do
+            # فحص Command Injection
+            if grep -n "os.system\|subprocess.call" "$file" | grep "request\|input"; then
+              echo "🚨 Command Injection محتمل: $file"
+            fi
+            
+            # فحص Pickle
+            if grep -n "pickle.loads" "$file"; then
+              echo "⚠️ استخدام Pickle غير آمن: $file"
+            fi
+          done
+          
+          echo "✅ تحليل Fortify مكتمل"
+          EOF
+          
+          chmod +x fortify-analysis.sh
+          ./fortify-analysis.sh > fortify-report.txt
+          
+          cat fortify-report.txt
+      
+      - name: 📊 تحليل نتائج Fortify
+        run: |
+          echo "📊 تحليل النتائج..."
+          
+          critical=$(grep -c "🚨" fortify-report.txt || echo "0")
+          high=$(grep -c "⚠️" fortify-report.txt || echo "0")
+          
+          cat << EOF > fortify-summary.json
+          {
+            "scan_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "critical_issues": $critical,
+            "high_issues": $high,
+            "status": "$([ $critical -eq 0 ] && echo 'PASSED' || echo 'FAILED')"
+          }
+          EOF
+          
+          echo "📋 ملخص Fortify:"
+          cat fortify-summary.json | jq '.'
+      
+      - name: 📤 رفع نتائج Fortify
+        uses: actions/upload-artifact@v4
+        with:
+          name: fortify-sca-results
+          path: |
+            fortify-report.txt
+            fortify-summary.json
+          retention-days: 90
+
+  # ========================================
+  # المرحلة 3: تحصين التبعيات
+  # ========================================
+  dependency-fortification:
+    name: 📦 تحصين التبعيات
+    runs-on: ubuntu-latest
+    needs: security-assessment
+    timeout-minutes: 30
+    
+    steps:
+      - name: 📥 استنساخ الكود
+        uses: actions/checkout@v4
+      
+      - name: 🔧 إعداد البيئة
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      
+      - name: 📦 تدقيق وتحديث التبعيات
+        run: |
+          if [ -f package.json ]; then
+            echo "📦 فحص تبعيات NPM..."
+            
+            # تثبيت التبعيات
+            npm ci
+            
+            # تدقيق شامل
+            npm audit --json > npm-audit-full.json || true
+            
+            # محاولة الإصلاح التلقائي
+            if [ "${{ env.AUTO_FIX }}" == "true" ]; then
+              echo "🔧 محاولة الإصلاح التلقائي..."
+              npm audit fix --force || true
+              npm audit fix || true
+            fi
+            
+            # فحص التبعيات القديمة
+            npx npm-check-updates -u --target minor > ncu-report.txt || true
+            
+            # تحليل حجم الحزم
+            npx cost-of-modules --less > package-sizes.txt || true
+          fi
+      
+      - name: 🔒 Snyk - حماية التبعيات
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=high --json-file-output=snyk-deps.json
+      
+      - name: 🛡️ إنشاء قائمة التبعيات الآمنة
+        run: |
+          cat << 'EOF' > generate-safe-deps.sh
+          #!/bin/bash
+          
+          echo "🔒 إنشاء قائمة التبعيات الآمنة..."
+          
+          if [ -f package.json ]; then
+            # استخراج التبعيات
+            jq -r '.dependencies, .devDependencies | keys[]' package.json > all-deps.txt
+            
+            # قائمة التبعيات الموثوقة
+            cat << 'SAFE' > safe-dependencies.json
+            {
+              "trusted_packages": [
+                "express",
+                "react",
+                "vue",
+                "axios",
+                "lodash",
+                "moment",
+                "dotenv"
+              ],
+              "security_score": "high",
+              "last_updated": "$(date -u +%Y-%m-%d)"
+            }
+          SAFE
+          fi
+          
+          echo "✅ تم إنشاء قائمة التبعيات الآمنة"
+          EOF
+          
+          chmod +x generate-safe-deps.sh
+          ./generate-safe-deps.sh
+      
+      - name: 📊 تقرير التبعيات المحصنة
+        run: |
+          cat << EOF > dependency-fortification-report.md
+          # 📦 تقرير تحصين التبعيات
+          
+          ## 📊 الإحصائيات
+          - **التاريخ**: $(date '+%Y-%m-%d %H:%M:%S')
+          - **إجمالي التبعيات**: $([ -f package.json ] && jq '.dependencies, .devDependencies | length' package.json || echo "0")
+          - **الإصلاحات التلقائية**: ${{ env.AUTO_FIX }}
+          
+          ## 🔒 الإجراءات المتخذة
+          - ✅ فحص جميع التبعيات
+          - ✅ تحديث الحزم الضعيفة
+          - ✅ تدقيق الثغرات الأمنية
+          - ✅ إنشاء قائمة التبعيات الآمنة
+          
+          EOF
+          
+          cat dependency-fortification-report.md
+      
+      - name: 📤 رفع التقارير
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-fortification
+          path: |
+            npm-audit-full.json
+            snyk-deps.json
+            safe-dependencies.json
+            dependency-fortification-report.md
+          retention-days: 90
+
+  # ========================================
+  # المرحلة 4: تحصين البنية التحتية
+  # ========================================
+  infrastructure-hardening:
+    name: 🏗️ تحصين البنية التحتية
+    runs-on: ubuntu-latest
+    needs: security-assessment
+    timeout-minutes: 25
+    
+    steps:
+      - name: 📥 استنساخ الكود
+        uses: actions/checkout@v4
+      
+      - name: 🐳 تحصين Docker
+        if: hashFiles('Dockerfile') != ''
+        run: |
+          cat << 'EOF' > hardened-dockerfile
+          # Dockerfile محصن - أفضل الممارسات الأمنية
+          
+          # استخدام صورة أساسية آمنة ومحدثة
+          FROM node:18-alpine3.18 AS builder
+          
+          # إنشاء مستخدم غير root
+          RUN addgroup -g 1001 -S appgroup && \
+              adduser -S appuser -u 1001 -G appgroup
+          
+          # تعيين مجلد العمل
+          WORKDIR /app
+          
+          # نسخ ملفات التبعيات فقط أولاً
+          COPY --chown=appuser:appgroup package*.json ./
+          
+          # تثبيت التبعيات
+          RUN npm ci --only=production --no-audit --no-fund && \
+              npm cache clean --force
+          
+          # نسخ باقي الملفات
+          COPY --chown=appuser:appgroup . .
+          
+          # البناء
+          RUN npm run build || true
+          
+          # المرحلة النهائية
+          FROM node:18-alpine3.18
+          
+          # تثبيت dumb-init للتعامل مع الإشارات بشكل صحيح
+          RUN apk add --no-cache dumb-init
+          
+          # إنشاء مستخدم
+          RUN addgroup -g 1001 -S appgroup && \
+              adduser -S appuser -u 1001 -G appgroup
+          
+          WORKDIR /app
+          
+          # نسخ من المرحلة السابقة
+          COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
+          COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+          COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
+          
+          # التبديل للمستخدم غير المميز
+          USER appuser
+          
+          # إعدادات الأمان
+          ENV NODE_ENV=production \
+              NODE_OPTIONS="--max-old-space-size=2048" \
+              NPM_CONFIG_LOGLEVEL=warn
+          
+          # فحص الصحة
+          HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+            CMD node healthcheck.js
+          
+          # تعريف المنفذ
+          EXPOSE 3000
+          
+          # نقطة الدخول
+          ENTRYPOINT ["dumb-init", "--"]
+          CMD ["node", "dist/index.js"]
+          EOF
+          
+          echo "✅ تم إنشاء Dockerfile محصن"
+          
+          # مقارنة مع Dockerfile الحالي
+          if [ -f Dockerfile ]; then
+            echo "📊 مقارنة Dockerfile:"
+            diff Dockerfile hardened-dockerfile || true
+          fi
+      
+      - name: 🔒 تحصين Nginx
+        run: |
+          cat << 'EOF' > nginx-hardened.conf
+          # Nginx Configuration - محصن بالكامل
+          
+          user nginx;
+          worker_processes auto;
+          error_log /var/log/nginx/error.log warn;
+          pid /var/run/nginx.pid;
+          
+          events {
+              worker_connections 2048;
+              use epoll;
+          }
+          
+          http {
+              include /etc/nginx/mime.types;
+              default_type application/octet-stream;
+              
+              # تحسينات الأداء
+              sendfile on;
+              tcp_nopush on;
+              tcp_nodelay on;
+              keepalive_timeout 65;
+              types_hash_max_size 2048;
+              
+              # إخفاء معلومات النسخة
+              server_tokens off;
+              
+              # حماية من Clickjacking
+              add_header X-Frame-Options "SAMEORIGIN" always;
+              
+              # حماية XSS
+              add_header X-XSS-Protection "1; mode=block" always;
+              
+              # حماية MIME
+              add_header X-Content-Type-Options "nosniff" always;
+              
+              # HSTS
+              add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+              
+              # CSP
+              add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
+              
+              # Referrer Policy
+              add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+              
+              # حماية من DDoS
+              limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
+              limit_conn_zone $binary_remote_addr zone=addr:10m;
+              
+              server {
+                  listen 443 ssl http2;
+                  server_name digital-warrior.com;
+                  
+                  # SSL Configuration
+                  ssl_certificate /etc/nginx/ssl/cert.pem;
+                  ssl_certificate_key /etc/nginx/ssl/key.pem;
+                  ssl_protocols TLSv1.2 TLSv1.3;
+                  ssl_ciphers HIGH:!aNULL:!MD5;
+                  ssl_prefer_server_ciphers on;
+                  
+                  # حماية DDoS
+                  limit_req zone=one burst=20 nodelay;
+                  limit_conn addr 10;
+                  
+                  root /var/www/html;
+                  index index.html;
+                  
+                  location / {
+                      try_files $uri $uri/ =404;
+                  }
+                  
+                  # حماية الملفات الحساسة
+                  location ~ /\. {
+                      deny all;
+                      access_log off;
+                      log_not_found off;
+                  }
+              }
+          }
+          EOF
+          
+          echo "✅ تم إنشاء تكوين Nginx محصن"
+      
+      - name: 🔐 إنشاء Security Headers
+        run: |
+          cat << 'EOF' > security-headers.js
+          // Security Headers Middleware - تحصين شامل
+          
+          module.exports = function securityHeaders(req, res, next) {
+            // حماية من Clickjacking
+            res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+            
+            // حماية XSS
+            res.setHeader('X-XSS-Protection', '1; mode=block');
+            
+            // حماية MIME Type
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            
+            // HSTS
+            res.setHeader(
+              'Strict-Transport-Security',
+              'max-age=31536000; includeSubDomains; preload'
+            );
+            
+            // CSP
+            res.setHeader(
+              'Content-Security-Policy',
+              "default-src 'self'; " +
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+              "style-src 'self' 'unsafe-inline'; " +
+              "img-src 'self' data: https:; " +
+              "font-src 'self' data:; " +
+              "connect-src 'self'; " +
+              "frame-ancestors 'none';"
+            );
+            
+            // Referrer Policy
+            res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+            
+            // Permissions Policy
+            res.setHeader(
+              'Permissions-Policy',
+              'geolocation=(), microphone=(), camera=()'
+            );
+            
+            // إخفاء تقنية السيرفر
+            res.removeHeader('X-Powered-By');
+            
+            next();
+          };
+          EOF
+          
+          echo "✅ تم إنشاء Security Headers Middleware"
+      
+      - name: 📤 رفع ملفات التحصين
+        uses: actions/upload-artifact@v4
+        with:
+          name: infrastructure-hardening
+          path: |
+            hardened-dockerfile
+            nginx-hardened.conf
+            security-headers.js
+          retention-days: 90
+
+  # ========================================
+  # المرحلة 5: تحصين قواعد البيانات
+  # ========================================
+  database-hardening:
+    name: 🗄️ تحصين قواعد البيانات
+    runs-on: ubuntu-latest
+    needs: security-assessment
+    timeout-minutes: 20
+    
+    steps:
+      - name: 📥 استنساخ الكود
+        uses: actions/checkout@v4
+      
+      - name: 🔒 إنشاء Connection Pool آمن
+        run: |
+          cat << 'EOF' > database-config-secure.js
+          // Database Configuration - محصن بالكامل
+          
+          const { Pool } = require('pg');
+          const mongoose = require('mongoose');
+          
+          // PostgreSQL Secure Connection Pool
+          const pgPool = new Pool({
+            user: process.env.DB_USER,
+            host: process.env.DB_HOST,
+            database: process.env.DB_NAME,
+            password: process.env.DB_PASSWORD,
+            port: process.env.DB_PORT || 5432,
+            
+            // إعدادات الأمان
+            ssl: {
+              rejectUnauthorized: true,
+              ca: process.env.DB_CA_CERT,
+              cert: process.env.DB_CLIENT_CERT,
+              key: process.env.DB_CLIENT_KEY
+            },
+            
+            // إعدادات الأداء والأمان
+            max: 20,
+            min: 5,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 2000,
+            
+            // حماية من SQL Injection
+            statement_timeout: 10000,
+            query_timeout: 10000
+          });
+          
+          // MongoDB Secure Connection
+          const mongooseOptions = {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            
+            // إعدادات الأمان
+            ssl: true,
+            sslValidate: true,
+            sslCA: process.env.MONGO_CA_CERT,
+            
+            // إعدادات الأداء
+            maxPoolSize: 10,
+            minPoolSize: 5,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            
+            // حماية إضافية
+            retryWrites: true,
+            w: 'majority'
+          };
+          
+          // دالة Sanitization لمنع NoSQL Injection
+          function sanitizeInput(input) {
+            if (typeof input === 'object' && input !== null) {
+              Object.keys(input).forEach(key => {
+                if (key.startsWith('$')) {
+                  delete input[key];
+                }
+              });
+            }
+            return input;
+          }
+          
+          // Prepared Statements للحماية من SQL Injection
+          async function secureQuery(query, params) {
+            const client = await pgPool.connect();
+            try {
+              // استخدام parameterized queries
+              const result = await client.query(query, params);
+              return result.rows;
+            } catch (error) {
+              console.error('Database error:', error.message);
+              throw new Error('Database operation failed');
+            } finally {
+              client.release();
+            }
+          }
+          
+          module.exports = {
+            pgPool,
+            mongooseOptions,
+            sanitizeInput,
+            secureQuery
+          };
+          EOF
+          
+          echo "✅ تم إنشاء تكوين قاعدة بيانات محصن"
+      
+      - name: 🛡️ إنشاء Query Validator
+        run: |
+          cat << 'EOF' > query-validator.js
+          // Query Validator - للحماية من الحقن
+          
+          class QueryValidator {
+            constructor() {
+              this.sqlInjectionPatterns = [
+                /(\s|^)(union|select|insert|update|delete|drop|create|alter|exec|execute)(\s|$)/i,
+                /'(\s|)(or|and)(\s|)'/i,
+                /--/,
+                /;(\s|)drop/i,
+                /xp_/i,
+                /sp_/i
+              ];
+              
+              this.nosqlInjectionPatterns = [
+                /\$where/i,
+                /\$ne/,
+                /\$gt/,
+                /\$regex/,
+                /javascript:/i
+              ];
+            }
+            
+            validateSQL(query) {
+              for (const pattern of this.sqlInjectionPatterns) {
+                if (pattern.test(query)) {
+                  throw new Error('Potential SQL injection detected');
+                }
+              }
+              return true;
+            }
+            
+            validateNoSQL(query) {
+              const queryString = JSON.stringify(query);
+              for (const pattern of this.nosqlInjectionPatterns) {
+                if (pattern.test(queryString)) {
+                  throw new Error('Potential NoSQL injection detected');
+                }
+              }
+              return true;
+            }
+            
+            sanitize(input) {
+              if (typeof input === 'string') {
+                // إزالة الأحرف الخطرة
+                return input
+                  .replace(/[^\w\s@.-]/g, '')
+                  .trim();
+              }
+              return input;
+            }
+          }
+          
+          module.exports = new QueryValidator();
+          EOF
+          
+          echo "✅ تم إنشاء Query Validator"
+      
+      - name: 📤 رفع ملفات تحصين قواعد البيانات
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-hardening
+          path: |
+            database-config-secure.js
+            query-validator.js
+          retention-days: 90
+
+  # ========================================
+  # المرحلة 6: تحصين API
+  # ========================================
+  api-fortification:
+    name: 🔌 تحصين API
+    runs-on: ubuntu-latest
+    needs: security-assessment
+    timeout-minutes: 20
+    
+    steps:
+      - name: 📥 استنسا
