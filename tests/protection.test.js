@@ -28,13 +28,21 @@ describe('ZayedCyberShield Basic Tests', () => {
     it('should validate IP address format', () => {
       const isValidIP = (ip) => {
         const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-        return ipRegex.test(ip);
+        if (!ipRegex.test(ip)) {
+          return false;
+        }
+        // Validate each octet is 0-255
+        const parts = ip.split('.');
+        return parts.every((part) => {
+          const num = parseInt(part, 10);
+          return num >= 0 && num <= 255;
+        });
       };
 
       expect(isValidIP('192.168.1.1')).toBe(true);
       expect(isValidIP('10.0.0.1')).toBe(true);
       expect(isValidIP('invalid')).toBe(false);
-      expect(isValidIP('256.1.1.1')).toBe(true); // Regex matches, validation is separate
+      expect(isValidIP('256.1.1.1')).toBe(false); // Invalid: 256 > 255
     });
 
     it('should detect dangerous keyboard shortcuts', () => {

@@ -148,7 +148,15 @@ install_dependencies() {
     if [ ! -d "$PROJECT_ROOT/node_modules" ]; then
         log "INFO" "Installing dependencies..."
         cd "$PROJECT_ROOT"
-        npm ci --prefer-offline 2>> "$LOG_FILE" || npm install 2>> "$LOG_FILE"
+        # Use npm ci if package-lock.json exists for reproducible builds
+        if [ -f "$PROJECT_ROOT/package-lock.json" ]; then
+            npm ci 2>> "$LOG_FILE" || {
+                log "WARNING" "npm ci failed, falling back to npm install"
+                npm install 2>> "$LOG_FILE"
+            }
+        else
+            npm install 2>> "$LOG_FILE"
+        fi
         log "SUCCESS" "Dependencies installed"
     else
         log "SUCCESS" "Dependencies already installed"

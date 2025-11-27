@@ -41,11 +41,21 @@ block_ip() {
     local ip="$1"
     local reason="$2"
     
-    # التحقق من صحة عنوان IP
+    # التحقق من صحة عنوان IP - التحقق الشامل
     if [[ ! $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo -e "${RED}  ❌ عنوان IP غير صالح: $ip${NC}"
         return 1
     fi
+    
+    # التحقق من صحة كل جزء من عنوان IP (0-255)
+    local IFS='.'
+    read -ra PARTS <<< "$ip"
+    for part in "${PARTS[@]}"; do
+        if [ "$part" -lt 0 ] || [ "$part" -gt 255 ]; then
+            echo -e "${RED}  ❌ عنوان IP غير صالح (قيمة خارج النطاق): $ip${NC}"
+            return 1
+        fi
+    done
     
     # تجنب حظر عناوين محلية مهمة
     if [[ "$ip" == "127.0.0.1" ]] || [[ "$ip" == "0.0.0.0" ]]; then

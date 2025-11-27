@@ -109,9 +109,18 @@ const SecurityUtils = {
     },
 
     /**
-     * Generate a simple hash of a string (not cryptographically secure)
+     * Generate a simple hash of a string
+     * 
+     * WARNING: This is NOT cryptographically secure. It is intended for:
+     * - Generating unique identifiers for logging purposes
+     * - Creating quick checksums for comparison
+     * - Non-security-critical fingerprinting
+     * 
+     * For security-sensitive operations (password storage, data integrity, etc.),
+     * use Node.js crypto module: require('crypto').createHash('sha256')
+     * 
      * @param {string} str - String to hash
-     * @returns {string} Hash string
+     * @returns {string} Hash string (not cryptographically secure)
      * @example
      * SecurityUtils.simpleHash('test') // '364492'
      */

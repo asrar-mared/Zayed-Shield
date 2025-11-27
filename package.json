@@ -65,6 +65,7 @@
     "webpack": "^5.88.0",
     "webpack-cli": "^5.1.0"
   },
+  "dependencies": {},
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

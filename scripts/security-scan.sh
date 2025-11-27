@@ -235,10 +235,10 @@ check_dangerous_patterns() {
         fi
     done
     
-    # Shell patterns
+    # Shell patterns - note: these patterns are for grep -E extended regex
     local shell_dangerous=(
         'eval "\$'
-        '\$\(.*\)\`'
+        '\$\(.*\)'
     )
     
     for pattern in "${shell_dangerous[@]}"; do

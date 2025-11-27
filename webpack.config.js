@@ -32,9 +32,8 @@ module.exports = {
           options: {
             presets: [
               ['@babel/preset-env', {
-                targets: {
-                  browsers: ['> 1%', 'last 2 versions', 'not dead'],
-                },
+                // Using browserslist configuration
+                targets: '> 1%, last 2 versions, not dead',
               }],
             ],
           },
