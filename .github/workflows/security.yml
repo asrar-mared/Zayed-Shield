@@ -66,7 +66,7 @@ jobs:
           fi
           
       - name: 🚨 فحص OWASP للثغرات
-        uses: zaproxy/action-baseline@v0.10.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: 'http://localhost:3000'
           rules_file_name: '.zap/rules.tsv'
