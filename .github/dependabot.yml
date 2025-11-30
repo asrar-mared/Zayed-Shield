@@ -1,0 +1,488 @@
+# 🛡️ Dependabot Configuration for Zayed Shield
+# درع زايد - إعدادات التحديثات التلقائية
+# 
+# Project: Zayed Shield | درع زايد
+# Organization: Central Base | القاعدة المركزية
+# Author: The Warrior (@asrar-mared)
+# Innovation ID: pHw-88E-bhb-KL7
+# 
+# 🇦🇪 Made with ❤️ in the UAE | صُنع بكل حب في الإمارات
+
+version: 2
+
+updates:
+  # ════════════════════════════════════════════════════════════════
+  # 📦 npm - Node.js / JavaScript Dependencies
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"      # فحص أسبوعي للتحديثات
+      day: "monday"           # كل يوم اثنين
+      time: "09:00"           # الساعة 9 صباحاً (UTC)
+      timezone: "Asia/Dubai"  # توقيت الإمارات
+    
+    # رسائل الـ Commit
+    commit-message:
+      prefix: "deps(npm)"
+      prefix-development: "deps-dev(npm)"
+      include: "scope"
+    
+    # التصنيفات
+    labels:
+      - "dependencies"
+      - "npm"
+      - "automated"
+      - "zayed-shield"
+    
+    # المراجعين
+    reviewers:
+      - "asrar-mared"
+    
+    # حد أقصى للـ PRs المفتوحة
+    open-pull-requests-limit: 10
+    
+    # أولويات التحديث
+    versioning-strategy: "increase"
+    
+    # تجاهل بعض التحديثات
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    
+    # السماح بالتحديثات
+    allow:
+      - dependency-type: "all"
+
+  # ════════════════════════════════════════════════════════════════
+  # 🐍 pip - Python Dependencies
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "10:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(pip)"
+      prefix-development: "deps-dev(pip)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+      - "zayed-shield"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 10
+    
+    versioning-strategy: "increase"
+    
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ════════════════════════════════════════════════════════════════
+  # ⚙️ GitHub Actions - CI/CD Workflows
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    
+    labels:
+      - "ci/cd"
+      - "github-actions"
+      - "automated"
+      - "zayed-shield"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 🐳 Docker - Container Images
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    
+    labels:
+      - "docker"
+      - "containers"
+      - "automated"
+      - "zayed-shield"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 📚 npm - Frontend Directory (if separate)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "11:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(frontend)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "npm"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 10
+
+  # ════════════════════════════════════════════════════════════════
+  # 🔧 npm - Backend Directory (if separate)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "12:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(backend)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "backend"
+      - "npm"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 10
+
+  # ════════════════════════════════════════════════════════════════
+  # 🔐 pip - Security Tools (if separate directory)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "pip"
+    directory: "/security"
+    schedule:
+      interval: "daily"        # يومي للأدوات الأمنية
+      time: "08:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "security(deps)"
+      include: "scope"
+    
+    labels:
+      - "security"
+      - "dependencies"
+      - "python"
+      - "critical"
+      - "zayed-shield"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 15
+    
+    # للأدوات الأمنية، نسمح بكل التحديثات
+    versioning-strategy: "increase"
+
+  # ════════════════════════════════════════════════════════════════
+  # 📦 Composer - PHP Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(composer)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "php"
+      - "composer"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 🦀 Cargo - Rust Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(cargo)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "rust"
+      - "cargo"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 🎯 Go Modules - Go Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(go)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "golang"
+      - "go-modules"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 💎 Bundler - Ruby Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "09:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(bundler)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "ruby"
+      - "bundler"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 🔧 Maven - Java Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "13:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(maven)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "java"
+      - "maven"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 🎓 Gradle - Java/Android Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(gradle)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "java"
+      - "android"
+      - "gradle"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 📱 Swift - iOS Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "swift"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "10:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(swift)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "ios"
+      - "swift"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 📦 NuGet - .NET Dependencies (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "10:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "deps(nuget)"
+      include: "scope"
+    
+    labels:
+      - "dependencies"
+      - "dotnet"
+      - "nuget"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 5
+
+  # ════════════════════════════════════════════════════════════════
+  # 🌐 Terraform - Infrastructure as Code (if applicable)
+  # ════════════════════════════════════════════════════════════════
+  - package-ecosystem: "terraform"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "10:00"
+      timezone: "Asia/Dubai"
+    
+    commit-message:
+      prefix: "infra(terraform)"
+      include: "scope"
+    
+    labels:
+      - "infrastructure"
+      - "terraform"
+      - "iac"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    open-pull-requests-limit: 3
+
+# ════════════════════════════════════════════════════════════════
+# 📝 ملاحظات هامة | Important Notes
+# ════════════════════════════════════════════════════════════════
+#
+# 🛡️ درع زايد - Zayed Shield
+# هذا الملف يدير التحديثات التلقائية لجميع التبعيات في المشروع
+# 
+# ⏰ الجدول الزمني:
+# - npm/pip: الاثنين 9-12 صباحاً
+# - GitHub Actions: الثلاثاء 9 صباحاً
+# - Docker: الأربعاء 9 صباحاً
+# - أدوات الأمان: يومياً 8 صباحاً
+# - باقي الأنظمة: موزعة على الأسبوع
+#
+# 🔐 الأمان:
+# - التحديثات الأمنية تُفحص يومياً
+# - التحديثات الرئيسية (major) محظورة افتراضياً
+# - جميع PRs تحتاج مراجعة @asrar-mared
+#
+# 🏷️ التصنيفات:
+# جميع PRs تُصنف تلقائياً لسهولة الفلترة
+#
+# 📊 الحدود:
+# - npm/pip: 10 PRs مفتوحة كحد أقصى
+# - باقي الأنظمة: 5 PRs كحد أقصى
+# - الأدوات الأمنية: 15 PR كحد أقصى
+#
+# 🇦🇪 Made with ❤️ in UAE | صُنع بحب في الإمارات
+# Innovation ID: pHw-88E-bhb-KL7
+# Organization: Central Base | القاعدة المركزية
+# ════════════════════════════════════════════════════════════════
