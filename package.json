@@ -65,7 +65,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "mini-css-extract-plugin": "^2.9.4",
     "terser-webpack-plugin": "^5.3.14",
-    "webpack": "^5.88.0",
+    "webpack": "^5.103.0",
     "webpack-cli": "^5.1.0"
   },
   "publishConfig": {
