@@ -1,0 +1,274 @@
+# ========================================
+# GitHub Labels Configuration
+# 
+# ========================================
+
+# Type Labels
+- name: "bug"
+  color: "d73a4a"
+  description: "Something isn't working | خطأ في النظام"
+
+- name: "enhancement"
+  color: "a2eeef"
+  description: "New feature or request | ميزة جديدة أو تحسين"
+
+- name: "documentation"
+  color: "0075ca"
+  description: "Improvements or additions to documentation | تحسينات في التوثيق"
+
+- name: "security"
+  color: "d93f0b"
+  description: "Security vulnerability or concern | ثغرة أو مشكلة أمنية"
+
+- name: "performance"
+  color: "fbca04"
+  description: "Performance improvement | تحسين الأداء"
+
+- name: "refactor"
+  color: "1d76db"
+  description: "Code refactoring | إعادة هيكلة الكود"
+
+- name: "tests"
+  color: "0e8a16"
+  description: "Related to testing | متعلق بالاختبارات"
+
+# Priority Labels
+- name: "priority: critical"
+  color: "b60205"
+  description: "Needs immediate attention | يحتاج انتباه فوري"
+
+- name: "priority: high"
+  color: "d93f0b"
+  description: "High priority | أولوية عالية"
+
+- name: "priority: medium"
+  color: "fbca04"
+  description: "Medium priority | أولوية متوسطة"
+
+- name: "priority: low"
+  color: "0e8a16"
+  description: "Low priority | أولوية منخفضة"
+
+# Status Labels
+- name: "status: needs-triage"
+  color: "ededed"
+  description: "Needs initial review | يحتاج مراجعة أولية"
+
+- name: "status: investigating"
+  color: "fef2c0"
+  description: "Under investigation | قيد التحقيق"
+
+- name: "status: confirmed"
+  color: "c5def5"
+  description: "Confirmed and ready to work on | مؤكد وجاهز للعمل عليه"
+
+- name: "status: in-progress"
+  color: "bfd4f2"
+  description: "Work in progress | قيد التنفيذ"
+
+- name: "status: blocked"
+  color: "d93f0b"
+  description: "Blocked by another issue | محظور بسبب مشكلة أخرى"
+
+- name: "status: waiting-feedback"
+  color: "fbca04"
+  description: "Waiting for feedback | في انتظار ملاحظات"
+
+- name: "status: ready-for-review"
+  color: "0e8a16"
+  description: "Ready for code review | جاهز للمراجعة"
+
+# Difficulty Labels
+- name: "good first issue"
+  color: "7057ff"
+  description: "Good for newcomers | مناسب للمبتدئين"
+
+- name: "help wanted"
+  color: "008672"
+  description: "Extra attention is needed | نحتاج مساعدة"
+
+- name: "difficulty: easy"
+  color: "c2e0c6"
+  description: "Easy to fix | سهل الإصلاح"
+
+- name: "difficulty: medium"
+  color: "fef2c0"
+  description: "Moderate difficulty | صعوبة متوسطة"
+
+- name: "difficulty: hard"
+  color: "f9d0c4"
+  description: "Complex issue | مشكلة معقدة"
+
+# Component Labels
+- name: "component: api"
+  color: "c5def5"
+  description: "Related to API | متعلق بـ API"
+
+- name: "component: ui"
+  color: "d4c5f9"
+  description: "Related to user interface | متعلق بواجهة المستخدم"
+
+- name: "component: database"
+  color: "c2e0c6"
+  description: "Related to database | متعلق بقاعدة البيانات"
+
+- name: "component: auth"
+  color: "fbca04"
+  description: "Authentication/Authorization | المصادقة والصلاحيات"
+
+- name: "component: signature"
+  color: "0075ca"
+  description: "Digital signature engine | محرك التوقيع الرقمي"
+
+- name: "component: certificate"
+  color: "1d76db"
+  description: "Certificate management | إدارة الشهادات"
+
+- name: "component: blockchain"
+  color: "5319e7"
+  description: "Blockchain integration | تكامل Blockchain"
+
+- name: "component: crypto"
+  color: "d93f0b"
+  description: "Cryptography | التشفير"
+
+- name: "component: ai"
+  color: "e99695"
+  description: "AI/ML features | ميزات الذكاء الاصطناعي"
+
+# Platform Labels
+- name: "platform: windows"
+  color: "0078d7"
+  description: "Windows specific | خاص بـ Windows"
+
+- name: "platform: linux"
+  color: "fcc624"
+  description: "Linux specific | خاص بـ Linux"
+
+- name: "platform: macos"
+  color: "000000"
+  description: "macOS specific | خاص بـ macOS"
+
+- name: "platform: web"
+  color: "1d76db"
+  description: "Web platform | المنصة الويب"
+
+- name: "platform: mobile"
+  color: "34d058"
+  description: "Mobile platform | المنصة المحمولة"
+
+- name: "platform: docker"
+  color: "2496ed"
+  description: "Docker related | متعلق بـ Docker"
+
+# Impact Labels
+- name: "breaking-change"
+  color: "b60205"
+  description: "Breaking API or behavior change | تغيير يكسر التوافق"
+
+- name: "needs-migration"
+  color: "d93f0b"
+  description: "Requires database/data migration | يحتاج migration"
+
+- name: "affects-many-users"
+  color: "d93f0b"
+  description: "Impacts many users | يؤثر على مستخدمين كثيرين"
+
+# Resolution Labels
+- name: "wontfix"
+  color: "ffffff"
+  description: "This will not be worked on | لن يتم العمل عليه"
+
+- name: "duplicate"
+  color: "cfd3d7"
+  description: "This issue or PR already exists | موجود مسبقاً"
+
+- name: "invalid"
+  color: "e4e669"
+  description: "This doesn't seem right | غير صحيح"
+
+- name: "question"
+  color: "d876e3"
+  description: "Further information is requested | يحتاج معلومات إضافية"
+
+# Special Labels
+- name: "dependencies"
+  color: "0366d6"
+  description: "Pull requests that update a dependency | تحديث التبعيات"
+
+- name: "github_actions"
+  color: "000000"
+  description: "Related to GitHub Actions | متعلق بـ GitHub Actions"
+
+- name: "needs-discussion"
+  color: "d876e3"
+  description: "Needs community discussion | يحتاج نقاش مجتمعي"
+
+- name: "stale"
+  color: "fef2c0"
+  description: "No activity for a long time | لا يوجد نشاط لفترة طويلة"
+
+- name: "on-hold"
+  color: "fbca04"
+  description: "Temporarily on hold | معلق مؤقتاً"
+
+# Version Labels
+- name: "v6.0"
+  color: "0052cc"
+  description: "Version 6.0 milestone"
+
+- name: "v9.0.3"
+  color: "0052cc"
+  description: "Version 6.1 milestone"
+
+- name: "backport-needed"
+  color: "d4c5f9"
+  description: "Needs to be backported to older versions | يحتاج backport"
+
+# CI/CD Labels
+- name: "ci"
+  color: "28a745"
+  description: "Continuous Integration | التكامل المستمر"
+
+- name: "deployment"
+  color: "0e8a16"
+  description: "Related to deployment | متعلق بالنشر"
+
+- name: "monitoring"
+  color: "5319e7"
+  description: "Monitoring and observability | المراقبة"
+
+# Quality Labels
+- name: "code-quality"
+  color: "1d76db"
+  description: "Code quality improvements | تحسين جودة الكود"
+
+- name: "technical-debt"
+  color: "d93f0b"
+  description: "Technical debt | دين تقني"
+
+- name: "needs-cleanup"
+  color: "fbca04"
+  description: "Code cleanup needed | يحتاج تنظيف"
+
+# Localization
+- name: "i18n"
+  color: "d4c5f9"
+  description: "Internationalization | الترجمة والتوطين"
+
+- name: "rtl"
+  color: "c5def5"
+  description: "Right-to-left language support | دعم اللغات من اليمين لليسار"
+
+# Community
+- name: "community"
+  color: "0e8a16"
+  description: "Community contribution | مساهمة مجتمعية"
+
+- name: "bounty"
+  color: "159818"
+  description: "Has bug bounty reward | له مكافأة Bug Bounty"
+
+- name: "hacktoberfest"
+  color: "ff7518"
+  description: "Hacktoberfest eligible | مؤهل لـ Hacktoberfest"
