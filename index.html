@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="درع زايد - منصة الأمن السيبراني العربية الأولى بروح إماراتية">
+  <title>درع زايد | Zayed Shield - الأمن السيبراني</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a1f3a 100%);
+      color: #fff;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    header {
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 255, 200, 0.2);
+      border-bottom: 2px solid rgba(0, 255, 200, 0.3);
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #00ffc8;
+      text-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      transition: all 0.3s;
+      padding: 8px 16px;
+      border-radius: 5px;
+    }
+
+    .nav-links a:hover {
+      color: #00ffc8;
+      background: rgba(0, 255, 200, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      margin-top: 100px;
+      padding: 80px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '🛡️';
+      position: absolute;
+      font-size: 600px;
+      opacity: 0.03;
+      top: -150px;
+      right: -100px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-30px); }
+    }
+
+    .hero h1 {
+      font-size: 64px;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #00ffc8, #00d4ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient 3s ease infinite;
+      background-size: 200% auto;
+    }
+
+    @keyframes gradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+      font-size: 22px;
+      color: #b0b8d4;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 15px 40px;
+      font-size: 18px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #00ffc8, #00d4ff);
+      color: #0a0e27;
+      box-shadow: 0 10px 30px rgba(0, 255, 200, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0, 255, 200, 0.6);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #00ffc8;
+      border: 2px solid #00ffc8;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 255, 200, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .features {
+      padding: 80px 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 60px;
+      color: #00ffc8;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    .feature-card {
+      background: rgba(26, 31, 58, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 200, 0.2);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 255, 200, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      border-color: #00ffc8;
+      box-shadow: 0 20px 50px rgba(0, 255, 200, 0.3);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #00ffc8;
+    }
+
+    .feature-card p {
+      color: #b0b8d4;
+      line-height: 1.6;
+    }
+
+    .services {
+      padding: 80px 30px;
+      background: rgba(26, 31, 58, 0.3);
+    }
+
+    .services-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .service-item {
+      background: rgba(10, 14, 39, 0.8);
+      padding: 30px;
+      border-radius: 15px;
+      border-right: 4px solid #00ffc8;
+      transition: all 0.3s;
+    }
+
+    .service-item:hover {
+      transform: translateX(-5px);
+      background: rgba(0, 255, 200, 0.1);
+    }
+
+    .service-item h4 {
+      color: #00ffc8;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .stats {
+      padding: 80px 30px;
+      text-align: center;
+    }
+
+    .stats-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+    }
+
+    .stat-item {
+      position: relative;
+    }
+
+    .stat-number {
+      font-size: 56px;
+      font-weight: bold;
+      color: #00ffc8;
+      text-shadow: 0 0 30px rgba(0, 255, 200, 0.5);
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 18px;
+      color: #b0b8d4;
+    }
+
+    .tools {
+      padding: 80px 30px;
+      background: rgba(26, 31, 58, 0.3);
+    }
+
+    .tools-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .tool-category {
+      margin-bottom: 50px;
+    }
+
+    .tool-category h3 {
+      font-size: 28px;
+      color: #00ffc8;
+      margin-bottom: 20px;
+      border-right: 4px solid #00ffc8;
+      padding-right: 15px;
+    }
+
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .tool-tag {
+      background: rgba(0, 255, 200, 0.1);
+      color: #00ffc8;
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .tool-tag:hover {
+      background: rgba(0, 255, 200, 0.2);
+      transform: scale(1.05);
+    }
+
+    .contact {
+      padding: 80px 30px;
+      text-align: center;
+    }
+
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(26, 31, 58, 0.6);
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 200, 0.2);
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      text-align: right;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      color: #00ffc8;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      border-radius: 10px;
+      background: rgba(10, 14, 39, 0.8);
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #00ffc8;
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+    }
+
+    footer {
+      background: rgba(10, 14, 39, 0.95);
+      padding: 50px 30px 20px;
+      text-align: center;
+      border-top: 2px solid rgba(0, 255, 200, 0.3);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .social-links a {
+      color: #00ffc8;
+      font-size: 32px;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .social-links a:hover {
+      transform: scale(1.2) rotate(10deg);
+      text-shadow: 0 0 20px rgba(0, 255, 200, 0.8);
+    }
+
+    .copyright {
+      color: #b0b8d4;
+      font-size: 14px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0, 255, 200, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 42px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .features-grid,
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        font-size: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">🛡️ درع زايد</div>
+      <ul class="nav-links">
+        <li><a href="#home">الرئيسية</a></li>
+        <li><a href="#features">المميزات</a></li>
+        <li><a href="#services">خدماتنا</a></li>
+        <li><a href="#tools">الأدوات</a></li>
+        <li><a href="#contact">اتصل بنا</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero" id="home">
+    <h1>🛡️ درع زايد 🇦🇪</h1>
+    <p>منصة الأمن السيبراني العربية الأولى | حماية رقمية بروح إماراتية وطموح عالمي</p>
+    <p style="font-size: 18px; color: #7b2ff7; margin-bottom: 40px;">
+      Zayed Shield: Cybersecurity for the Arab World
+    </p>
+    <div class="cta-buttons">
+      <a href="#services" class="btn btn-primary">🚀 ابدأ الآن</a>
+      <a href="#tools" class="btn btn-secondary">🔧 اكتشف الأدوات</a>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <h2 class="section-title">⚡ لماذا درع زايد؟</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>حماية متقدمة</h3>
+        <p>أنظمة أمنية متطورة تحمي بياناتك من جميع أنواع التهديدات السيبرانية</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <h3>ذكاء اصطناعي</h3>
+        <p>تقنيات AI متقدمة لاكتشاف التهديدات والاستجابة التلقائية للهجمات</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3>تحليل عميق</h3>
+        <p>تحليل شامل للبيانات والأنماط المشبوهة مع تقارير تفصيلية دقيقة</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>استجابة فورية</h3>
+        <p>فريق دعم متاح 24/7 للاستجابة الفورية للحوادث الأمنية</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🌍</span>
+        <h3>تغطية عربية</h3>
+        <p>محتوى وخدمات باللغة العربية مع فهم عميق لاحتياجات المنطقة</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🎓</span>
+        <h3>تدريب وتعليم</h3>
+        <p>برامج تدريبية متخصصة وشهادات معتمدة في الأمن السيبراني</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <h2 class="section-title">📈 أرقامنا تتحدث</h2>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">500K+</div>
+        <div class="stat-label">جهاز محمي</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">10M+</div>
+        <div class="stat-label">تهديد تم إيقافه</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">مراقبة مستمرة</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">99.9%</div>
+        <div class="stat-label">معدل الحماية</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <h2 class="section-title">🎯 خدماتنا المتكاملة</h2>
+    <div class="services-grid">
+      <div class="service-item">
+        <h4>🔍 اختبار الاختراق</h4>
+        <p>فحص شامل للثغرات الأمنية في أنظمتك</p>
+      </div>
+
+      <div class="service-item">
+        <h4>🛡️ حماية الشبكات</h4>
+        <p>جدار ناري متقدم وحماية من DDoS</p>
+      </div>
+
+      <div class="service-item">
+        <h4>🔐 تشفير البيانات</h4>
+        <p>حماية وتشفير البيانات الحساسة</p>
+      </div>
+
+      <div class="service-item">
+        <h4>📱 أمان التطبيقات</h4>
+        <p>فحص وتأمين التطبيقات الويب والموبايل</p>
+      </div>
+
+      <div class="service-item">
+        <h4>🚨 الاستجابة للحوادث</h4>
+        <p>فريق سريع للتعامل مع الحوادث الأمنية</p>
+      </div>
+
+      <div class="service-item">
+        <h4>📊 تقييم المخاطر</h4>
+        <p>تحليل شامل للمخاطر الأمنية المحتملة</p>
+      </div>
+
+      <div class="service-item">
+        <h4>🎓 تدريب الموظفين</h4>
+        <p>برامج توعية وتدريب على الأمن السيبراني</p>
+      </div>
+
+      <div class="service-item">
+        <h4>☁️ أمان السحابة</h4>
+        <p>حماية البيئات السحابية والبيانات</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tools" id="tools">
+    <div class="tools-container">
+      <h2 class="section-title">🔧 أدوات الأمن السيبراني</h2>
+      
+      <div class="tool-category">
+        <h3>⚔️ أدوات الهجوم الأخلاقي</h3>
+        <div class="tool-tags">
+          <span class="tool-tag">🗡️ Metasploit</span>
+          <span class="tool-tag">🎯 Burp Suite</span>
+          <span class="tool-tag">💉 SQLMap</span>
+          <span class="tool-tag">🔨 Nmap</span>
+          <span class="tool-tag">⚡ Aircrack-ng</span>
+          <span class="tool-tag">🦈 Wireshark</span>
+        </div>
+      </div>
+
+      <div class="tool-category">
+        <h3>🛡️ أدوات الدفاع والحماية</h3>
+        <div class="tool-tags">
+          <span class="tool-tag">🔥 Snort</span>
+          <span class="tool-tag">👁️ Suricata</span>
+          <span class="tool-tag">🛡️ ClamAV</span>
+          <span class="tool-tag">🚧 Fail2ban</span>
+          <span class="tool-tag">🔐 OpenVPN</span>
+        </div>
+      </div>
+
+      <div class="tool-category">
+        <h3>🔍 أدوات التحليل والفحص</h3>
+        <div class="tool-tags">
+          <span class="tool-tag">🔬 Autopsy</span>
+          <span class="tool-tag">💾 Volatility</span>
+          <span class="tool-tag">📊 Splunk</span>
+          <span class="tool-tag">🔎 OSSEC</span>
+          <span class="tool-tag">📈 Nagios</span>
+        </div>
+      </div>
+
+      <div class="tool-category">
+        <h3>🔐 أدوات التشفير</h3>
+        <div class="tool-tags">
+          <span class="tool-tag">🔑 GPG</span>
+          <span class="tool-tag">🗝️ VeraCrypt</span>
+          <span class="tool-tag">🔒 OpenSSL</span>
+          <span class="tool-tag">💼 KeePass</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2 class="section-title">📞 تواصل معنا</h2>
+    <div class="contact-form">
+      <form id="contactForm">
+        <div class="form-group">
+          <label for="name">الاسم</label>
+          <input type="text" id="name" placeholder="أدخل اسمك" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني</label>
+          <input type="email" id="email" placeholder="example@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="message">الرسالة</label>
+          <textarea id="message" rows="5" placeholder="كيف يمكننا مساعدتك؟" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">📤 إرسال الرسالة</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="social-links">
+        <a href="#" title="Twitter">🐦</a>
+        <a href="#" title="LinkedIn">💼</a>
+        <a href="#" title="GitHub">💻</a>
+        <a href="#" title="YouTube">📺</a>
+      </div>
+      <p class="copyright">
+        © 2024 درع زايد | Zayed Shield. جميع الحقوق محفوظة<br>
+        صُنع بـ ❤️ في الإمارات العربية المتحدة 🇦🇪
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('شكراً لتواصلك معنا! 🛡️\nسنرد عليك في أقرب وقت ممكن.');
+      this.reset();
+    });
+
+    const animateStats = () => {
+      const stats = document.querySelectorAll('.stat-number');
+      stats.forEach(stat => {
+        const target = stat.textContent;
+        const number = parseInt(target.replace(/\D/g, ''));
+        let current = 0;
+        const increment = number / 50;
+        const suffix = target.replace(/[0-9]/g, '');
+        
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= number) {
+            stat.textContent = number + suffix;
+            clearInterval(timer);
+          } else {
+            stat.textContent = Math.floor(current) + suffix;
+          }
+        }, 30);
+      });
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateStats();
+          observer.disconnect();
+        }
+      });
+    });
+
+    observer.observe(document.querySelector('.stats'));
+  </script>
+</body>
+</html>
