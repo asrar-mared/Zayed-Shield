@@ -131,7 +131,7 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "passport-google-oauth20": "^2.0.0",
-    "express-session": "^1.17.3",
+    "express-session": "^1.18.2",
     "connect-redis": "^7.1.0",
     "csurf": "^1.11.0",
     "hpp": "^0.2.3",
