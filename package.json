@@ -125,7 +125,7 @@
     "nodemailer": "^6.9.7",
     "socket.io": "^4.6.0",
     "ws": "^8.16.0",
-    "bull": "^4.12.0",
+    "bull": "^4.16.5",
     "agenda": "^5.0.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
