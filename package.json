@@ -167,7 +167,7 @@
     "nodemon": "^3.0.2",
     "rimraf": "^5.0.5",
     "cross-env": "^7.0.3",
-    "dotenv-cli": "^7.3.0",
+    "dotenv-cli": "^7.4.4",
     "concurrently": "^8.2.2",
     "npm-check-updates": "^16.14.12",
     "snyk": "^1.1274.0",
