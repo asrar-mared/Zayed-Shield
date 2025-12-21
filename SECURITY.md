@@ -1,3 +1,21 @@
+## Temporary Read-Only Security & Governance Notice
+
+This repository is temporarily placed in a read-only governance state.
+
+The source code remains publicly visible for transparency and review purposes,
+however, no external contributions, execution changes, or workflow modifications
+are accepted during this period.
+
+This is a preventive security and compliance measure while the project undergoes
+final internal reviews and controlled delivery preparation.
+
+There is no active security incident or compromise.
+All actions are intentional, documented, and aligned with hardened security practices.
+
+Status: Read-Only (Temporary)
+Release: v20.0.0
+
+
 # Security Policy
 
 ## Supported Versions
