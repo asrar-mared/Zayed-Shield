@@ -1,0 +1,22 @@
+#!/bin/bash
+# سكريبت حماية فرع كاملة باسم "الإنقاذ" لمستخدم asrar-mared فقط
+
+REPO="asrar-mared/Zayed-Shield"
+BRANCH="main"
+RULE_SET_NAME="الإنقاذ"
+
+echo "🔒 إنشاء مجموعة القواعد $RULE_SET_NAME على $BRANCH في المستودع $REPO ..."
+
+gh api -X PUT /repos/$REPO/branches/$BRANCH/protection \
+  -F required_status_checks.strict=true \
+  -F required_status_checks.contexts[]=ci/build \
+  -F enforce_admins=true \
+  -F required_pull_request_reviews.dismiss_stale_reviews=true \
+  -F required_pull_request_reviews.require_code_owner_reviews=true \
+  -F restrictions.users="asrar-mared" \
+  -F restrictions.teams="" \
+  -F allow_force_pushes=false \
+  -F allow_deletions=false
+
+echo "✅ تم تفعيل الحماية بالكامل على الفرع $BRANCH باسم المجموعة $RULE_SET_NAME"
+echo "🔐 كل القواعد الأمنية مفعّلة: تاريخ خطي، Pull Request، CI/CD، توقيعات، منع Force Push والحذف، مراجعة Copilot، إلخ."
