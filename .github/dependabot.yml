@@ -1,458 +1,0 @@
-# ============================================================================
-# 🛡️ Dependabot Configuration - Zayed Shield Repository
-# ============================================================================
-# مؤسسة الرئاسة - القاعدة المركزية
-# Presidential Institution - Central Command
-# 
-# الهدف: مراقبة وتحديث التبعيات تلقائياً للمستودع المركزي
-# Purpose: Automated dependency monitoring and updates for the central repo
-# 
-# المراجع:
-# - GitHub Dependabot Docs: https://docs.github.com/en/code-security/dependabot
-# - Dependabot Configuration: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-# 
-# المحارب بلا مقابل - لوجه الله
-# ============================================================================
-
-version: 2
-
-# ============================================================================
-# 🔐 إعدادات السجلات الخاصة (إذا لزم الأمر)
-# Private Registry Settings (if needed)
-# ============================================================================
-# registries:
-#   npm-github:
-#     type: npm-registry
-#     url: https://npm.pkg.github.com
-#     token: ${{secrets.GITHUB_TOKEN}}
-
-# ============================================================================
-# 📦 تكوينات التحديث | Update Configurations
-# ============================================================================
-
-updates:
-  # ==========================================================================
-  # 🐙 GitHub Actions - تحديث workflows
-  # ==========================================================================
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"      # الفحص أسبوعياً
-      day: "sunday"           # يوم الأحد
-      time: "03:00"           # الساعة 3 صباحاً (UTC)
-      timezone: "Asia/Dubai"  # توقيت الإمارات
-    
-    # عدد PRs المفتوحة في نفس الوقت
-    open-pull-requests-limit: 5
-    
-    # التصنيفات
-    labels:
-      - "dependencies"
-      - "github-actions"
-      - "security"
-      - "automated"
-    
-    # المراجعين
-    reviewers:
-      - "asrar-mared"
-    
-    # المعينين
-    assignees:
-      - "asrar-mared"
-    
-    # بادئة رسائل الـ commit
-    commit-message:
-      prefix: "chore(actions)"
-      include: "scope"
-    
-    # السماح بالإصدارات
-    # latest: أحدث إصدار فقط
-    # widen: توسيع نطاق الإصدارات المسموحة
-    versioning-strategy: increase
-    
-    # تجميع التحديثات
-    groups:
-      github-actions:
-        patterns:
-          - "*"
-    
-    # رسالة PR مخصصة
-    pull-request-branch-name:
-      separator: "-"
-    
-    # الإشعارات
-    # يمكن ربطها بـ Slack أو Discord
-    # notification: "slack-webhook-url"
-
-  # ==========================================================================
-  # 📦 npm - تحديث تبعيات Node.js (إذا وُجد package.json)
-  # ==========================================================================
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"       # فحص يومي للأمان
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 10
-    
-    labels:
-      - "dependencies"
-      - "npm"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-    
-    # فصل التحديثات الأمنية عن العادية
-    versioning-strategy: increase
-    
-    # تجاهل بعض الحزم إذا لزم الأمر
-    # ignore:
-    #   - dependency-name: "package-name"
-    #     versions: ["1.x", "2.x"]
-    
-    # تجميع التحديثات حسب النوع
-    groups:
-      production-dependencies:
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
-      
-      development-dependencies:
-        dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
-      
-      security-updates:
-        patterns:
-          - "*"
-        update-types:
-          - "security"
-
-  # ==========================================================================
-  # 🐍 pip - تحديث تبعيات Python (إذا وُجد requirements.txt)
-  # ==========================================================================
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 10
-    
-    labels:
-      - "dependencies"
-      - "python"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-    
-    versioning-strategy: increase
-    
-    groups:
-      python-dependencies:
-        patterns:
-          - "*"
-
-  # ==========================================================================
-  # 🐳 Docker - تحديث base images
-  # ==========================================================================
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "docker"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(docker)"
-      include: "scope"
-
-  # ==========================================================================
-  # 🔧 Terraform - تحديث modules (إذا استخدمت Infrastructure as Code)
-  # ==========================================================================
-  - package-ecosystem: "terraform"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 3
-    
-    labels:
-      - "dependencies"
-      - "terraform"
-      - "infrastructure"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(terraform)"
-      include: "scope"
-
-  # ==========================================================================
-  # 🔷 Maven - تحديث تبعيات Java (إذا وُجد pom.xml)
-  # ==========================================================================
-  - package-ecosystem: "maven"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "java"
-      - "maven"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-    
-    groups:
-      java-dependencies:
-        patterns:
-          - "*"
-
-  # ==========================================================================
-  # 🔶 Gradle - تحديث تبعيات Java/Kotlin (إذا وُجد build.gradle)
-  # ==========================================================================
-  - package-ecosystem: "gradle"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "java"
-      - "kotlin"
-      - "gradle"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-
-  # ==========================================================================
-  # 💎 Bundler - تحديث تبعيات Ruby (إذا وُجد Gemfile)
-  # ==========================================================================
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "thursday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "ruby"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-
-  # ==========================================================================
-  # 🔵 Go modules - تحديث تبعيات Go (إذا وُجد go.mod)
-  # ==========================================================================
-  - package-ecosystem: "gomod"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "golang"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-    
-    groups:
-      go-dependencies:
-        patterns:
-          - "*"
-
-  # ==========================================================================
-  # 🦀 Cargo - تحديث تبعيات Rust (إذا وُجد Cargo.toml)
-  # ==========================================================================
-  - package-ecosystem: "cargo"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "rust"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-
-  # ==========================================================================
-  # 🎯 Composer - تحديث تبعيات PHP (إذا وُجد composer.json)
-  # ==========================================================================
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "03:00"
-      timezone: "Asia/Dubai"
-    
-    open-pull-requests-limit: 5
-    
-    labels:
-      - "dependencies"
-      - "php"
-      - "security"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    assignees:
-      - "asrar-mared"
-    
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-
-# ============================================================================
-# 📝 ملاحظات الاستخدام | ملاحظات الاستخدام
-# ============================================================================
-
-# 1. تفعيل Dependabot:
-# - انتقل إلى الإعدادات > الأمن والتحليل
-#    - فعّل "Dependabot alerts"
-# - فعّل "تحديثات أمان Dependabot"
-# - فعّل "تحديثات إصدار Dependabot"
-
-# 2. التخصيص حسب المستودع:
-#    - احذف أنظمة الحزم غير المستخدمة
-#    - عدّل الجداول الزمنية حسب احتياجاتك
-#    - أضف ignore rules للحزم التي لا تريد تحديثها
-
-# 3. المراقبة:
-#    - راقب PRs الجديدة من Dependabot
-#    - راجع التحديثات الأمنية فوراً
-#    - ادمج التحديثات بعد الاختبار
-
-# 4. الأمان:
-#    - التحديثات الأمنية لها أولوية قصوى
-#    - اختبر التحديثات قبل الدمج
-#    - راجع CHANGELOG للتغييرات الكبيرة
-
-# 5. أفضل الممارسات:
-#    - استخدم groups لتجميع التحديثات المتشابهة
-# - اضبط Open-Pul-Requests-LiX لتجنب الفوضى
-#    - استخدم labels لتصنيف PRs
-#    - عيّن reviewers للمراجعة
-
-# ============================================================================
-# 🛡️ محمية من زايد شيلد
-# مؤسسة الرئاسة - القاعدة المركزية
-# المحارب بلا مقابل - لوجه الله
-# ============================================================================
