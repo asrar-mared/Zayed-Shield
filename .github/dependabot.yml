@@ -1,488 +1,458 @@
-# 🛡️ Dependabot Configuration for Zayed Shield
-# درع زايد - إعدادات التحديثات التلقائية
+# ============================================================================
+# 🛡️ Dependabot Configuration - Zayed Shield Repository
+# ============================================================================
+# مؤسسة الرئاسة - القاعدة المركزية
+# Presidential Institution - Central Command
 # 
-# Project: Zayed Shield | درع زايد
-# Organization: Central Base | القاعدة المركزية
-# Author: The Warrior (@asrar-mared)
-# Innovation ID: pHw-88E-bhb-KL7
+# الهدف: مراقبة وتحديث التبعيات تلقائياً للمستودع المركزي
+# Purpose: Automated dependency monitoring and updates for the central repo
 # 
-# 🇦🇪 Made with ❤️ in the UAE | صُنع بكل حب في الإمارات
+# المراجع:
+# - GitHub Dependabot Docs: https://docs.github.com/en/code-security/dependabot
+# - Dependabot Configuration: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# 
+# المحارب بلا مقابل - لوجه الله
+# ============================================================================
 
 version: 2
 
+# ============================================================================
+# 🔐 إعدادات السجلات الخاصة (إذا لزم الأمر)
+# Private Registry Settings (if needed)
+# ============================================================================
+# registries:
+#   npm-github:
+#     type: npm-registry
+#     url: https://npm.pkg.github.com
+#     token: ${{secrets.GITHUB_TOKEN}}
+
+# ============================================================================
+# 📦 تكوينات التحديث | Update Configurations
+# ============================================================================
+
 updates:
-  # ════════════════════════════════════════════════════════════════
-  # 📦 npm - Node.js / JavaScript Dependencies
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "npm"
+  # ==========================================================================
+  # 🐙 GitHub Actions - تحديث workflows
+  # ==========================================================================
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"      # فحص أسبوعي للتحديثات
-      day: "monday"           # كل يوم اثنين
-      time: "09:00"           # الساعة 9 صباحاً (UTC)
+      interval: "weekly"      # الفحص أسبوعياً
+      day: "sunday"           # يوم الأحد
+      time: "03:00"           # الساعة 3 صباحاً (UTC)
       timezone: "Asia/Dubai"  # توقيت الإمارات
     
-    # رسائل الـ Commit
-    commit-message:
-      prefix: "deps(npm)"
-      prefix-development: "deps-dev(npm)"
-      include: "scope"
+    # عدد PRs المفتوحة في نفس الوقت
+    open-pull-requests-limit: 5
     
     # التصنيفات
     labels:
       - "dependencies"
-      - "npm"
+      - "github-actions"
+      - "security"
       - "automated"
-      - "zayed-shield"
     
     # المراجعين
     reviewers:
       - "asrar-mared"
     
-    # حد أقصى للـ PRs المفتوحة
+    # المعينين
+    assignees:
+      - "asrar-mared"
+    
+    # بادئة رسائل الـ commit
+    commit-message:
+      prefix: "chore(actions)"
+      include: "scope"
+    
+    # السماح بالإصدارات
+    # latest: أحدث إصدار فقط
+    # widen: توسيع نطاق الإصدارات المسموحة
+    versioning-strategy: increase
+    
+    # تجميع التحديثات
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    
+    # رسالة PR مخصصة
+    pull-request-branch-name:
+      separator: "-"
+    
+    # الإشعارات
+    # يمكن ربطها بـ Slack أو Discord
+    # notification: "slack-webhook-url"
+
+  # ==========================================================================
+  # 📦 npm - تحديث تبعيات Node.js (إذا وُجد package.json)
+  # ==========================================================================
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"       # فحص يومي للأمان
+      time: "03:00"
+      timezone: "Asia/Dubai"
+    
     open-pull-requests-limit: 10
     
-    # أولويات التحديث
-    versioning-strategy: "increase"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "security"
+      - "automated"
     
-    # تجاهل بعض التحديثات
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+    reviewers:
+      - "asrar-mared"
     
-    # السماح بالتحديثات
-    allow:
-      - dependency-type: "all"
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    
+    # فصل التحديثات الأمنية عن العادية
+    versioning-strategy: increase
+    
+    # تجاهل بعض الحزم إذا لزم الأمر
+    # ignore:
+    #   - dependency-name: "package-name"
+    #     versions: ["1.x", "2.x"]
+    
+    # تجميع التحديثات حسب النوع
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "security"
 
-  # ════════════════════════════════════════════════════════════════
-  # 🐍 pip - Python Dependencies
-  # ════════════════════════════════════════════════════════════════
+  # ==========================================================================
+  # 🐍 pip - تحديث تبعيات Python (إذا وُجد requirements.txt)
+  # ==========================================================================
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "10:00"
+      interval: "daily"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "deps(pip)"
-      prefix-development: "deps-dev(pip)"
-      include: "scope"
+    open-pull-requests-limit: 10
     
     labels:
       - "dependencies"
       - "python"
+      - "security"
       - "automated"
-      - "zayed-shield"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 10
-    
-    versioning-strategy: "increase"
-    
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-
-  # ════════════════════════════════════════════════════════════════
-  # ⚙️ GitHub Actions - CI/CD Workflows
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-      timezone: "Asia/Dubai"
+    assignees:
+      - "asrar-mared"
     
     commit-message:
-      prefix: "ci"
+      prefix: "chore(deps)"
       include: "scope"
     
-    labels:
-      - "ci/cd"
-      - "github-actions"
-      - "automated"
-      - "zayed-shield"
+    versioning-strategy: increase
     
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 5
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
 
-  # ════════════════════════════════════════════════════════════════
-  # 🐳 Docker - Container Images
-  # ════════════════════════════════════════════════════════════════
+  # ==========================================================================
+  # 🐳 Docker - تحديث base images
+  # ==========================================================================
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "wednesday"
-      time: "09:00"
+      day: "monday"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "docker"
-      include: "scope"
+    open-pull-requests-limit: 5
     
     labels:
+      - "dependencies"
       - "docker"
-      - "containers"
-      - "automated"
-      - "zayed-shield"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 5
-
-  # ════════════════════════════════════════════════════════════════
-  # 📚 npm - Frontend Directory (if separate)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "11:00"
-      timezone: "Asia/Dubai"
-    
-    commit-message:
-      prefix: "deps(frontend)"
-      include: "scope"
-    
-    labels:
-      - "dependencies"
-      - "frontend"
-      - "npm"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 10
-
-  # ════════════════════════════════════════════════════════════════
-  # 🔧 npm - Backend Directory (if separate)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "npm"
-    directory: "/backend"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "12:00"
-      timezone: "Asia/Dubai"
-    
-    commit-message:
-      prefix: "deps(backend)"
-      include: "scope"
-    
-    labels:
-      - "dependencies"
-      - "backend"
-      - "npm"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 10
-
-  # ════════════════════════════════════════════════════════════════
-  # 🔐 pip - Security Tools (if separate directory)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "pip"
-    directory: "/security"
-    schedule:
-      interval: "daily"        # يومي للأدوات الأمنية
-      time: "08:00"
-      timezone: "Asia/Dubai"
-    
-    commit-message:
-      prefix: "security(deps)"
-      include: "scope"
-    
-    labels:
       - "security"
-      - "dependencies"
-      - "python"
-      - "critical"
-      - "zayed-shield"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 15
-    
-    # للأدوات الأمنية، نسمح بكل التحديثات
-    versioning-strategy: "increase"
-
-  # ════════════════════════════════════════════════════════════════
-  # 📦 Composer - PHP Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "thursday"
-      time: "09:00"
-      timezone: "Asia/Dubai"
-    
-    commit-message:
-      prefix: "deps(composer)"
-      include: "scope"
-    
-    labels:
-      - "dependencies"
-      - "php"
-      - "composer"
       - "automated"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 5
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"
 
-  # ════════════════════════════════════════════════════════════════
-  # 🦀 Cargo - Rust Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "cargo"
+  # ==========================================================================
+  # 🔧 Terraform - تحديث modules (إذا استخدمت Infrastructure as Code)
+  # ==========================================================================
+  - package-ecosystem: "terraform"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
-      time: "09:00"
+      day: "tuesday"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "deps(cargo)"
-      include: "scope"
+    open-pull-requests-limit: 3
     
     labels:
       - "dependencies"
-      - "rust"
-      - "cargo"
+      - "terraform"
+      - "infrastructure"
       - "automated"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 5
-
-  # ════════════════════════════════════════════════════════════════
-  # 🎯 Go Modules - Go Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "gomod"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "09:00"
-      timezone: "Asia/Dubai"
-    
-    commit-message:
-      prefix: "deps(go)"
-      include: "scope"
-    
-    labels:
-      - "dependencies"
-      - "golang"
-      - "go-modules"
-      - "automated"
-    
-    reviewers:
+    assignees:
       - "asrar-mared"
     
-    open-pull-requests-limit: 5
-
-  # ════════════════════════════════════════════════════════════════
-  # 💎 Bundler - Ruby Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "09:00"
-      timezone: "Asia/Dubai"
-    
     commit-message:
-      prefix: "deps(bundler)"
+      prefix: "chore(terraform)"
       include: "scope"
-    
-    labels:
-      - "dependencies"
-      - "ruby"
-      - "bundler"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 5
 
-  # ════════════════════════════════════════════════════════════════
-  # 🔧 Maven - Java Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
+  # ==========================================================================
+  # 🔷 Maven - تحديث تبعيات Java (إذا وُجد pom.xml)
+  # ==========================================================================
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "13:00"
+      day: "wednesday"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "deps(maven)"
-      include: "scope"
+    open-pull-requests-limit: 5
     
     labels:
       - "dependencies"
       - "java"
       - "maven"
+      - "security"
       - "automated"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 5
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    
+    groups:
+      java-dependencies:
+        patterns:
+          - "*"
 
-  # ════════════════════════════════════════════════════════════════
-  # 🎓 Gradle - Java/Android Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
+  # ==========================================================================
+  # 🔶 Gradle - تحديث تبعيات Java/Kotlin (إذا وُجد build.gradle)
+  # ==========================================================================
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "tuesday"
-      time: "10:00"
+      day: "wednesday"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "deps(gradle)"
-      include: "scope"
+    open-pull-requests-limit: 5
     
     labels:
       - "dependencies"
       - "java"
-      - "android"
+      - "kotlin"
       - "gradle"
+      - "security"
       - "automated"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 5
-
-  # ════════════════════════════════════════════════════════════════
-  # 📱 Swift - iOS Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "swift"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "10:00"
-      timezone: "Asia/Dubai"
+    assignees:
+      - "asrar-mared"
     
     commit-message:
-      prefix: "deps(swift)"
+      prefix: "chore(deps)"
       include: "scope"
-    
-    labels:
-      - "dependencies"
-      - "ios"
-      - "swift"
-      - "automated"
-    
-    reviewers:
-      - "asrar-mared"
-    
-    open-pull-requests-limit: 5
 
-  # ════════════════════════════════════════════════════════════════
-  # 📦 NuGet - .NET Dependencies (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "nuget"
+  # ==========================================================================
+  # 💎 Bundler - تحديث تبعيات Ruby (إذا وُجد Gemfile)
+  # ==========================================================================
+  - package-ecosystem: "bundler"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "thursday"
-      time: "10:00"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "deps(nuget)"
-      include: "scope"
+    open-pull-requests-limit: 5
     
     labels:
       - "dependencies"
-      - "dotnet"
-      - "nuget"
+      - "ruby"
+      - "security"
       - "automated"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 5
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
 
-  # ════════════════════════════════════════════════════════════════
-  # 🌐 Terraform - Infrastructure as Code (if applicable)
-  # ════════════════════════════════════════════════════════════════
-  - package-ecosystem: "terraform"
+  # ==========================================================================
+  # 🔵 Go modules - تحديث تبعيات Go (إذا وُجد go.mod)
+  # ==========================================================================
+  - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "10:00"
+      time: "03:00"
       timezone: "Asia/Dubai"
     
-    commit-message:
-      prefix: "infra(terraform)"
-      include: "scope"
+    open-pull-requests-limit: 5
     
     labels:
-      - "infrastructure"
-      - "terraform"
-      - "iac"
+      - "dependencies"
+      - "golang"
+      - "security"
       - "automated"
     
     reviewers:
       - "asrar-mared"
     
-    open-pull-requests-limit: 3
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
 
-# ════════════════════════════════════════════════════════════════
-# 📝 ملاحظات هامة | Important Notes
-# ════════════════════════════════════════════════════════════════
-#
-# 🛡️ درع زايد - Zayed Shield
-# هذا الملف يدير التحديثات التلقائية لجميع التبعيات في المشروع
-# 
-# ⏰ الجدول الزمني:
-# - npm/pip: الاثنين 9-12 صباحاً
-# - GitHub Actions: الثلاثاء 9 صباحاً
-# - Docker: الأربعاء 9 صباحاً
-# - أدوات الأمان: يومياً 8 صباحاً
-# - باقي الأنظمة: موزعة على الأسبوع
-#
-# 🔐 الأمان:
-# - التحديثات الأمنية تُفحص يومياً
-# - التحديثات الرئيسية (major) محظورة افتراضياً
-# - جميع PRs تحتاج مراجعة @asrar-mared
-#
-# 🏷️ التصنيفات:
-# جميع PRs تُصنف تلقائياً لسهولة الفلترة
-#
-# 📊 الحدود:
-# - npm/pip: 10 PRs مفتوحة كحد أقصى
-# - باقي الأنظمة: 5 PRs كحد أقصى
-# - الأدوات الأمنية: 15 PR كحد أقصى
-#
-# 🇦🇪 Made with ❤️ in UAE | صُنع بحب في الإمارات
-# Innovation ID: pHw-88E-bhb-KL7
-# Organization: Central Base | القاعدة المركزية
-# ════════════════════════════════════════════════════════════════
+  # ==========================================================================
+  # 🦀 Cargo - تحديث تبعيات Rust (إذا وُجد Cargo.toml)
+  # ==========================================================================
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "Asia/Dubai"
+    
+    open-pull-requests-limit: 5
+    
+    labels:
+      - "dependencies"
+      - "rust"
+      - "security"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # ==========================================================================
+  # 🎯 Composer - تحديث تبعيات PHP (إذا وُجد composer.json)
+  # ==========================================================================
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "03:00"
+      timezone: "Asia/Dubai"
+    
+    open-pull-requests-limit: 5
+    
+    labels:
+      - "dependencies"
+      - "php"
+      - "security"
+      - "automated"
+    
+    reviewers:
+      - "asrar-mared"
+    
+    assignees:
+      - "asrar-mared"
+    
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+# ============================================================================
+# 📝 ملاحظات الاستخدام | ملاحظات الاستخدام
+# ============================================================================
+
+# 1. تفعيل Dependabot:
+# - انتقل إلى الإعدادات > الأمن والتحليل
+#    - فعّل "Dependabot alerts"
+# - فعّل "تحديثات أمان Dependabot"
+# - فعّل "تحديثات إصدار Dependabot"
+
+# 2. التخصيص حسب المستودع:
+#    - احذف أنظمة الحزم غير المستخدمة
+#    - عدّل الجداول الزمنية حسب احتياجاتك
+#    - أضف ignore rules للحزم التي لا تريد تحديثها
+
+# 3. المراقبة:
+#    - راقب PRs الجديدة من Dependabot
+#    - راجع التحديثات الأمنية فوراً
+#    - ادمج التحديثات بعد الاختبار
+
+# 4. الأمان:
+#    - التحديثات الأمنية لها أولوية قصوى
+#    - اختبر التحديثات قبل الدمج
+#    - راجع CHANGELOG للتغييرات الكبيرة
+
+# 5. أفضل الممارسات:
+#    - استخدم groups لتجميع التحديثات المتشابهة
+# - اضبط Open-Pul-Requests-LiX لتجنب الفوضى
+#    - استخدم labels لتصنيف PRs
+#    - عيّن reviewers للمراجعة
+
+# ============================================================================
+# 🛡️ محمية من زايد شيلد
+# مؤسسة الرئاسة - القاعدة المركزية
+# المحارب بلا مقابل - لوجه الله
+# ============================================================================
