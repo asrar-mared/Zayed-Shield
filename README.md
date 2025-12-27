@@ -6,8 +6,8 @@
 
 <div align="center">
 
-# 🛡️ مشروع درع زايد | Zayed Shield Project 🛡️
-
+**# 🛡️ مشروع درع زايد | Zayed Shield Project 🛡️
+**
 ![Zayed Shield Banner](https://via.placeholder.com/900x300/00732F/FFFFFF?text=🇦🇪+ZAYED+SHIELD+🛡️)
 ![Screenshot_٢٠٢٥١١٢٢_١٩٥٨١٠_Claude](https://github.com/user-attachments/assets/e9aad415-425a-4806-931d-5bb6d47e107c)
 
